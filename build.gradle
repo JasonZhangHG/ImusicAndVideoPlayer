@@ -1,0 +1,60 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+//应用Config配置文件
+apply from: "config.gradle"
+//应用Bintray配置文件
+apply from: "bintray.gradle"
+
+buildscript {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.0.1'
+        //添加bintray环境
+        classpath 'com.novoda:bintray-release:0.8.1'
+        //无需再单独引用tinker的其他库
+        classpath "com.tinkerpatch.sdk:tinkerpatch-gradle-plugin:1.2.13.3"
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/google' }
+        maven { url 'http://maven.aliyun.com/nexus/content/repositories/gradle-plugin' }
+        jcenter()
+        google()
+        //本地Maven仓库地址,取决于你的磁盘目录
+//        maven { url 'file://D://AndroidStudioProjects//IMusic//maven' }
+        //本地局域网仓库地址
+//        maven { url 'http://localhost:8081/nexus/content/repositories/releases/' }
+        //Bintray插件仓库支持
+        maven { url 'https://dl.bintray.com/novoda-oss/snapshots/' }
+    }
+    //编译时报注释GBK编码错误解决
+    tasks.withType(Javadoc) {
+        //方法上忽略@return和@param注解未添加说明注释
+        options.addStringOption('Xdoclint:none', '-quiet')
+        //解决GBK编码错误提示
+        options.addStringOption('encoding', 'UTF-8')
+        options.addStringOption('charSet', 'UTF-8')
+    }
+    //跳过构建时link检查
+    tasks.whenTaskAdded { task ->
+        if (task.name.equals("lint")) {
+            task.enabled = false
+        }
+    }
+}
+
+
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
